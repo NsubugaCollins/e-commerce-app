@@ -21,7 +21,6 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Product? _product;
   bool _loading = true;
-  int _qty = 1;
 
   @override
   void initState() {
@@ -49,10 +48,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       context.push('/login');
       return;
     }
-    final ok = await context.read<CartProvider>().addProduct(
-          widget.productId,
-          quantity: _qty,
-        );
+    final ok = await context.read<CartProvider>().addProduct(widget.productId);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(ok ? 'Added to cart' : 'Could not add to cart')),
@@ -107,21 +103,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 const SizedBox(height: 12),
                 if (p.description != null && p.description!.isNotEmpty)
                   Text(p.description!),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    const Text('Quantity:'),
-                    IconButton(
-                      onPressed: _qty > 1 ? () => setState(() => _qty--) : null,
-                      icon: const Icon(Icons.remove_circle_outline),
-                    ),
-                    Text('$_qty', style: const TextStyle(fontSize: 18)),
-                    IconButton(
-                      onPressed: () => setState(() => _qty++),
-                      icon: const Icon(Icons.add_circle_outline),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
