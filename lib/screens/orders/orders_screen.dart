@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/order.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/page_wrapper.dart';
@@ -79,12 +80,30 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Payment: ${o.paymentMethod}'),
-                                  Text('Address: ${o.shippingAddress}'),
+                                  Text('Delivery Address: ${o.shippingAddress}'),
                                   const Divider(),
                                   ...o.items.map(
                                     (item) => ListTile(
                                       dense: true,
+                                      leading: item.product?.imageUrl != null
+                                          ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(6),
+                                              child: CachedNetworkImage(
+                                                imageUrl: item.product!.imageUrl,
+                                                width: 40,
+                                                height: 40,
+                                                fit: BoxFit.cover,
+                                                errorWidget: (c, u, e) => const Icon(Icons.image, size: 24),
+                                                placeholder: (c, u) => const SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                                ),
+                                              ),
+                                            )
+                                          : const Icon(Icons.image, size: 40),
                                       title: Text(item.product?.name ?? 'Item'),
+                                      subtitle: Text(currency.format(item.price)),
                                       trailing: Text('x${item.quantity}'),
                                     ),
                                   ),
@@ -107,6 +126,12 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
                                     TextButton(
                                       onPressed: () => _rateOrder(context, o.id),
                                       child: const Text('Rate order'),
+                                    ),
+                                  if (o.status == 'pending')
+                                    TextButton.icon(
+                                      onPressed: () => _cancelOrder(context, o.id),
+                                      icon: const Icon(Icons.cancel_outlined, color: Colors.red),
+                                      label: const Text('Cancel order', style: TextStyle(color: Colors.red)),
                                     ),
                                 ],
                               ),
@@ -158,6 +183,44 @@ class _OrdersScreenState extends State<OrdersScreen> with AutomaticKeepAliveClie
             orderId: orderId,
           );
       _load();
+    }
+  }
+
+  Future<void> _cancelOrder(BuildContext context, int orderId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel Order'),
+        content: const Text('Are you sure you want to cancel this order?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Yes, Cancel'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && context.mounted) {
+      setState(() => _loading = true);
+      try {
+        await context.read<AuthProvider>().api.cancelOrder(orderId);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Order cancelled successfully')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to cancel order: $e')),
+          );
+        }
+      } finally {
+        _load();
+      }
     }
   }
 }

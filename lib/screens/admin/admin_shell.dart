@@ -23,7 +23,7 @@ class AdminShell extends StatelessWidget {
       drawer: Drawer(
         child: ListView(
           children: [
-            const DrawerHeader(child: Text('Campus Mall Admin')),
+            const DrawerHeader(child: Text('Cycle Admin')),
             ListTile(
               leading: const Icon(Icons.analytics),
               title: const Text('Analytics'),

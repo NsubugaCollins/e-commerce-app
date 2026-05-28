@@ -17,23 +17,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _showPasswordDialog(BuildContext context) async {
     final current = TextEditingController();
-    final password = TextEditingController();
+    final newPass = TextEditingController();
     final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Change password'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: current, obscureText: true, decoration: const InputDecoration(labelText: 'Current password')),
-            const SizedBox(height: 12),
-            TextField(controller: password, obscureText: true, decoration: const InputDecoration(labelText: 'New password')),
-          ],
+      builder: (ctx) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Change password',
+                  style: Theme.of(ctx).textTheme.titleLarge),
+              const SizedBox(height: 20),
+              TextField(
+                controller: current,
+                obscureText: true,
+                textInputAction: TextInputAction.next,
+                decoration: const InputDecoration(
+                  labelText: 'Current password',
+                  prefixIcon: Icon(Icons.lock_outline),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: newPass,
+                obscureText: true,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                  labelText: 'New password',
+                  prefixIcon: Icon(Icons.lock_reset),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Save')),
-        ],
       ),
     );
 
@@ -41,7 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       try {
         await context.read<AuthProvider>().api.updatePassword(
               currentPassword: current.text,
-              password: password.text,
+              password: newPass.text,
             );
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated')));
@@ -68,22 +102,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : PageWrapper(
-              child: LayoutBuilder(
-                builder: (context, constraints) => Center(
+      body: PageWrapper(
+        child: LayoutBuilder(
+          builder: (context, constraints) => Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 700),
+              child: SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 700),
-                  child: SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
                             Text('Appearance', style: Theme.of(context).textTheme.titleMedium),
                             const SizedBox(height: 8),
                             SwitchListTile(
@@ -151,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             const SizedBox(height: 8),
                             ListTile(
                               leading: const Icon(Icons.location_on),
-                              title: const Text('Saved shipping addresses'),
+                              title: const Text('Saved delivery addresses'),
                               subtitle: const Text('Manage your favorite delivery addresses'),
                               trailing: const Text('Suggested', style: TextStyle(fontSize: 12)),
                               onTap: () => _showComingSoon('Saved addresses'),
@@ -211,14 +243,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               onChanged: settings.setVerboseLogging,
                             ),
                           ],
-                        ),
-                      ),
                     ),
                   ),
                 ),
               ),
             ),
+          ),
         ),
+      ),
     );
   }
 }

@@ -133,6 +133,11 @@ class CampusMallApi {
     return OrderModel.fromJson(res.data!['order'] as Map<String, dynamic>);
   }
 
+  Future<OrderModel> cancelOrder(int orderId) async {
+    final res = await _client.post<Map<String, dynamic>>('/orders/$orderId/cancel');
+    return OrderModel.fromJson(res.data!['order'] as Map<String, dynamic>);
+  }
+
   Future<String> getPayPalApprovalUrl(int orderId) async {
     final res =
         await _client.post<Map<String, dynamic>>('/orders/$orderId/paypal');

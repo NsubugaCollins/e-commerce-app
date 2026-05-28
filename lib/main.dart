@@ -47,7 +47,7 @@ class _CampusMallAppState extends State<CampusMallApp> {
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settings, _) => MaterialApp.router(
-          title: 'Campus Mall',
+          title: 'Cycle',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),

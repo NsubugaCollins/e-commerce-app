@@ -15,7 +15,6 @@ class MessagesScreen extends StatefulWidget {
 class _MessagesScreenState extends State<MessagesScreen> {
   final _controller = TextEditingController();
   List<ChatMessage> _messages = [];
-  int _adminId = 0;
   bool _loading = true;
 
   @override
@@ -31,7 +30,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
       if (mounted) {
         setState(() {
           _messages = data.messages;
-          _adminId = data.adminId;
           _loading = false;
         });
       }

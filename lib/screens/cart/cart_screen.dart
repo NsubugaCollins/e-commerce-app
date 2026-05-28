@@ -80,28 +80,11 @@ class _CartScreenState extends State<CartScreen> {
                                         Text(item.product.name, maxLines: 2),
                                         Text(currency.format(item.lineTotal)),
                                         Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
                                           children: [
                                             IconButton(
-                                              icon: const Icon(Icons.remove),
-                                              onPressed: item.quantity > 1
-                                                  ? () => cart.updateQuantity(
-                                                        item.id,
-                                                        item.quantity - 1,
-                                                      )
-                                                  : null,
-                                            ),
-                                            Text('${item.quantity}'),
-                                            IconButton(
-                                              icon: const Icon(Icons.add),
-                                              onPressed: () => cart.updateQuantity(
-                                                    item.id,
-                                                    item.quantity + 1,
-                                                  ),
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(Icons.delete_outline),
-                                              onPressed: () =>
-                                                  cart.removeItem(item.id),
+                                              icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                              onPressed: () => cart.removeItem(item.id),
                                             ),
                                           ],
                                         ),

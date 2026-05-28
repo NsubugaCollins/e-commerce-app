@@ -82,7 +82,11 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Campus Mall'),
+        title: Image.asset(
+          'assets/images/MAIN LOGO 2.png',
+          height: 36,
+          fit: BoxFit.contain,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),

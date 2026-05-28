@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
@@ -22,6 +23,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _load();
+  }
+
+  Future<void> _shareToWhatsApp(String code) async {
+    final message = Uri.encodeComponent(
+        'Join Cycle using my referral link and get 20 bonus reward points! 🎁 https://campus-cylce.com/register?ref=$code');
+    final url = Uri.parse('https://wa.me/?text=$message');
+    if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      // success
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open WhatsApp')),
+        );
+      }
+    }
+  }
+
+  Future<void> _shareToTelegram(String code) async {
+    final link = Uri.encodeComponent('https://campus-cylce.com/register?ref=$code');
+    final message = Uri.encodeComponent('Join Cycle using my referral link and get 20 bonus reward points! 🎁');
+    final url = Uri.parse('https://t.me/share/url?url=$link&text=$message');
+    if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      // success
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open Telegram')),
+        );
+      }
+    }
   }
 
   Future<void> _load() async {
@@ -85,17 +116,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               const SizedBox(height: 12),
                               Card(
-                                child: ListTile(
-                                  title: const Text('Your referral code'),
-                                  subtitle: Text(user.referralCode),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.copy),
-                                    onPressed: () {
-                                      Clipboard.setData(ClipboardData(text: user.referralCode));
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Copied!')),
-                                      );
-                                    },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Your referral code',
+                                        style: Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context).cardColor.withValues(alpha: 0.5),
+                                                borderRadius: BorderRadius.circular(8),
+                                                border: Border.all(color: Theme.of(context).dividerColor),
+                                              ),
+                                              child: Text(
+                                                user.referralCode,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 2,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          IconButton.filledTonal(
+                                            icon: const Icon(Icons.copy),
+                                            onPressed: () {
+                                              Clipboard.setData(ClipboardData(text: user.referralCode));
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(content: Text('Copied!')),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: ElevatedButton.icon(
+                                              onPressed: () => _shareToWhatsApp(user.referralCode),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: const Color(0xFF25D366),
+                                                foregroundColor: Colors.white,
+                                              ),
+                                              icon: const Icon(Icons.share),
+                                              label: const Text('WhatsApp'),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: ElevatedButton.icon(
+                                              onPressed: () => _shareToTelegram(user.referralCode),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: const Color(0xFF229ED9),
+                                                foregroundColor: Colors.white,
+                                              ),
+                                              icon: const Icon(Icons.telegram),
+                                              label: const Text('Telegram'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),

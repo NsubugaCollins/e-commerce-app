@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/user.dart';
@@ -42,8 +41,12 @@ class AuthProvider extends ChangeNotifier {
       status = AuthStatus.authenticated;
       notifyListeners();
       return true;
-    } on DioException catch (e) {
-      error = ApiClient().parseError(e);
+    } on AppException catch (e) {
+      error = e.message;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      error = e.toString();
       notifyListeners();
       return false;
     }
@@ -69,8 +72,12 @@ class AuthProvider extends ChangeNotifier {
       status = AuthStatus.authenticated;
       notifyListeners();
       return true;
-    } on DioException catch (e) {
-      error = ApiClient().parseError(e);
+    } on AppException catch (e) {
+      error = e.message;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      error = e.toString();
       notifyListeners();
       return false;
     }

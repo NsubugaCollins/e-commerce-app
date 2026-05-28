@@ -31,19 +31,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.storefront, size: 72, color: Color(0xFFE65100)),
-            SizedBox(height: 16),
-            Text(
-              'Campus Mall',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            Image.asset(
+              'assets/images/MAIN LOGO 2.png',
+              height: 120,
             ),
-            SizedBox(height: 24),
-            CircularProgressIndicator(),
+            const SizedBox(height: 32),
+            const CircularProgressIndicator(),
           ],
         ),
       ),

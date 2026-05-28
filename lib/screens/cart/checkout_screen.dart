@@ -30,7 +30,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _placeOrder() async {
     if (_address.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter shipping address')),
+        const SnackBar(content: Text('Enter delivery address')),
       );
       return;
     }
@@ -95,7 +95,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             controller: _address,
             maxLines: 3,
             decoration: const InputDecoration(
-              labelText: 'Shipping address',
+              labelText: 'Delivery address',
               alignLabelWithHint: true,
             ),
           ),
