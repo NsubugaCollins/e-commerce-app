@@ -1,3 +1,4 @@
+
 # Campus Mall Mobile
 
 Flutter app for the [Campus Mall](../campus_mall) Laravel store.
@@ -49,3 +50,7 @@ flutter run
 ## API
 
 All endpoints are under `/api` on the Laravel backend. See `../campus_mall/routes/api.php`.
+=======
+# e-commerce-app
+the app for e commerce
+>>>>>>> 0c33b3f0191c4b242093d78aff5b154d1711b5c4
