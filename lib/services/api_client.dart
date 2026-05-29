@@ -36,7 +36,11 @@ class ApiClient {
   }
 
   late final Dio _dio;
-  final _storage = const FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+  );
 
   Future<String> getBaseUrl() async {
     final prefs = await SharedPreferences.getInstance();

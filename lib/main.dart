@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,22 @@ import 'router/app_router.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Catch Flutter framework errors (e.g. layout overflows, widget exceptions)
+  // and log them instead of crashing the app.
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    if (kReleaseMode) {
+      // In release builds swallow non-fatal framework errors gracefully.
+    }
+  };
+
+  // Catch async errors that escape the Flutter framework (e.g. isolate errors).
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('Uncaught platform error: $error');
+    return true; // returning true marks the error as handled.
+  };
+
   runApp(const CampusMallApp());
 }
 
@@ -32,6 +49,11 @@ class _CampusMallAppState extends State<CampusMallApp> {
     _settingsProvider = SettingsProvider();
     _settingsProvider.load();
     _router = AppRouter.create(_authProvider);
+    // NOTE: bootstrap() is intentionally NOT called here.
+    // SplashScreen is the single place that calls bootstrap() so there is
+    // only ever one concurrent auth check.  Calling it here AND in
+    // SplashScreen caused two simultaneous notifyListeners() calls which
+    // triggered GoRouter's redirect-cycle assertion and crashed the app.
   }
 
   @override

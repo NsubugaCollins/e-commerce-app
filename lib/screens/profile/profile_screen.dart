@@ -26,30 +26,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _shareToWhatsApp(String code) async {
-    final message = Uri.encodeComponent(
-        'Join Cycle using my referral link and get 20 bonus reward points! 🎁 https://campus-cylce.com/register?ref=$code');
-    final url = Uri.parse('https://wa.me/?text=$message');
-    if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      // success
-    } else {
+    try {
+      final message = Uri.encodeComponent(
+          'Join Cycle using my referral link and get 20 bonus reward points! 🎁 https://campus-cylce.com/register?ref=$code');
+      final url = Uri.parse('https://wa.me/?text=$message');
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open WhatsApp')),
+          );
+        }
+      }
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open WhatsApp')),
+          SnackBar(content: Text('Error: ${e.toString()}')),
         );
       }
     }
   }
 
   Future<void> _shareToTelegram(String code) async {
-    final link = Uri.encodeComponent('https://campus-cylce.com/register?ref=$code');
-    final message = Uri.encodeComponent('Join Cycle using my referral link and get 20 bonus reward points! 🎁');
-    final url = Uri.parse('https://t.me/share/url?url=$link&text=$message');
-    if (await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      // success
-    } else {
+    try {
+      final link = Uri.encodeComponent('https://campus-cylce.com/register?ref=$code');
+      final message = Uri.encodeComponent('Join Cycle using my referral link and get 20 bonus reward points! 🎁');
+      final url = Uri.parse('https://t.me/share/url?url=$link&text=$message');
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open Telegram')),
+          );
+        }
+      }
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open Telegram')),
+          SnackBar(content: Text('Error: ${e.toString()}')),
         );
       }
     }

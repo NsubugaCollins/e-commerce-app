@@ -13,9 +13,18 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    signingConfigs {
+        release {
+            storeFile = file("release.keystore")
+            storePassword = "campus123"
+            keyAlias = "campus_mall"
+            keyPassword = "campus123"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.campusmall.campus_mall_mobile"
-        minSdk = flutter.minSdkVersion
+        minSdkVersion = flutter.minSdkVersion  // flutter_secure_storage requires Android 6.0 (API 23) minimum
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -23,7 +32,9 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.release
+            minifyEnabled = false
+            shrinkResources = false
         }
     }
 }

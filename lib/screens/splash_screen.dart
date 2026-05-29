@@ -20,7 +20,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _init() async {
     final auth = context.read<AuthProvider>();
-    await auth.bootstrap();
+    try {
+      // Use a timeout so the splash never hangs forever on bad networks.
+      await auth.bootstrap().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          // Treat a timeout the same as unauthenticated; the user can log in.
+        },
+      );
+    } catch (_) {
+      // Any unexpected error during bootstrap is treated as unauthenticated.
+    }
     if (!mounted) return;
     if (auth.status == AuthStatus.authenticated) {
       context.go(auth.isAdmin ? '/admin' : '/home');

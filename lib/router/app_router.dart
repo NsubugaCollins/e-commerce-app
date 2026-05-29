@@ -38,49 +38,43 @@ import '../screens/user/trade_in_list_screen.dart';
 class AppRouter {
   static GoRouter create(AuthProvider auth) {
     return GoRouter(
-      initialLocation: '/splash',
+      initialLocation: '/home',
       refreshListenable: auth,
       redirect: (context, state) {
         final loc = state.matchedLocation;
         final isAuth = auth.status == AuthStatus.authenticated;
         final isAdmin = auth.isAdmin;
         final isAdminRoute = loc.startsWith('/admin');
-        final isUserRoute = !isAdminRoute &&
-            !loc.startsWith('/login') &&
-            !loc.startsWith('/register') &&
-            loc != '/splash';
 
+        // ── 1. Still determining auth state → hold at splash ──────────────
         if (auth.status == AuthStatus.unknown) {
           return loc == '/splash' ? null : '/splash';
         }
 
-        if (isAuth && isAdmin && !isAdminRoute && loc != '/splash') {
-          return '/admin';
+        // ── 2. Leave splash once auth state is known ───────────────────────
+        if (loc == '/splash') {
+          if (isAuth && isAdmin) return '/admin';
+          return '/home'; // both authenticated-user and guest go to /home
         }
 
-        if (isAuth && !isAdmin && isAdminRoute) {
-          return '/home';
+        // ── 3. Admin users must stay in /admin routes ──────────────────────
+        if (isAuth && isAdmin && !isAdminRoute) return '/admin';
+
+        // ── 4. Regular users must not access /admin routes ─────────────────
+        if (isAuth && !isAdmin && isAdminRoute) return '/home';
+
+        // ── 5. Guests may not access protected routes ──────────────────────
+        const protectedRoutes = ['/cart', '/checkout', '/orders', '/profile', '/messages'];
+        if (!isAuth) {
+          if (protectedRoutes.any((r) => loc == r || loc.startsWith('$r/'))) {
+            return '/login';
+          }
+          if (isAdminRoute) return '/home';
         }
 
-        if (!isAuth && (loc == '/cart' || loc == '/checkout' || loc == '/orders' ||
-            loc == '/profile' || loc == '/messages' || loc.startsWith('/sell'))) {
-          return '/login';
-        }
-
+        // ── 6. Already-logged-in users don't need login/register ───────────
         if (isAuth && (loc == '/login' || loc == '/register')) {
           return isAdmin ? '/admin' : '/home';
-        }
-
-        final guestOk = loc == '/login' ||
-            loc == '/register' ||
-            loc == '/splash' ||
-            loc.startsWith('/home') ||
-            loc.startsWith('/product') ||
-            loc.startsWith('/category') ||
-            loc == '/search';
-
-        if (!isAuth && !guestOk && isUserRoute) {
-          return '/home';
         }
 
         return null;
